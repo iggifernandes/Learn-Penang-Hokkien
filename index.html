@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Penang Hokkien Speaking Trainer</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#DD1D21">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Penang Hokkien">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--red:#DD1D21;--yellow:#FBCE07;--grey:#6b6b6b;--line:#e4e4e4;--bg:#fafafa;--ink:#222}
+*{box-sizing:border-box}
+html{font-size:clamp(15px,1.1vw + 11px,20px)}
+body{margin:0;font-family:'Jost',system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{width:min(100% - 2rem,46rem);margin:0 auto;padding:1rem 0 4rem}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;border-bottom:3px solid var(--yellow);padding-bottom:.8rem;margin-bottom:1rem}
+h1{font-weight:300;text-transform:uppercase;letter-spacing:.25em;color:var(--grey);font-size:1.1rem;margin:.2rem 0 0}
+h1 b{color:var(--red);font-weight:500}
+h2{font-weight:300;text-transform:uppercase;letter-spacing:.18em;color:var(--grey);font-size:.95rem;margin:1.2rem 0 .6rem}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:.3rem}
+.ver{font-size:.7rem;color:var(--grey);letter-spacing:.1em}
+.lang button{border:1px solid var(--line);background:#fff;padding:.25rem .6rem;font:inherit;font-size:.75rem;cursor:pointer;color:var(--grey)}
+.lang button.on{background:var(--red);border-color:var(--red);color:#fff}
+nav{display:flex;gap:.2rem;margin-bottom:1rem}
+nav button{flex:1;border:0;border-bottom:2px solid var(--line);background:none;padding:.6rem .2rem;font:inherit;text-transform:uppercase;letter-spacing:.1em;font-weight:300;font-size:.78rem;color:var(--grey);cursor:pointer}
+nav button.on{border-color:var(--red);color:var(--red);font-weight:500}
+.card{background:#fff;border:1px solid var(--line);padding:1.1rem;margin-bottom:.8rem}
+.btn{display:inline-block;border:0;background:var(--red);color:#fff;padding:.7rem 1.2rem;font:inherit;text-transform:uppercase;letter-spacing:.12em;font-size:.8rem;cursor:pointer;margin:.2rem .2rem 0 0;text-decoration:none}
+.btn.alt{background:#fff;color:var(--grey);border:1px solid var(--line)}
+.btn.yel{background:var(--yellow);color:#222}
+.btn.sm{padding:.4rem .7rem;font-size:.7rem}
+.btn.rec{background:#fde8e8;color:var(--red);border-color:var(--red)}
+.btn[disabled]{opacity:.4;cursor:default}
+.muted{color:var(--grey);font-size:.85rem}
+.step{display:flex;gap:.6rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--line)}
+.step:last-child{border:0}
+.dot{width:1.4rem;height:1.4rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.75rem;flex:none}
+.dot.ok{background:var(--yellow);border-color:var(--yellow)}
+.phrase{text-align:center;padding:1.2rem .6rem}
+.big{font-size:1.9rem;font-weight:300;letter-spacing:.04em;line-height:1.3}
+.mean{font-size:1.1rem;margin-top:.8rem;color:var(--red)}
+.prog{height:4px;background:var(--line);margin-bottom:.8rem}
+.prog i{display:block;height:100%;background:var(--red)}
+table{width:100%;border-collapse:collapse}
+td{padding:.45rem .3rem;border-bottom:1px solid var(--line);vertical-align:top;font-size:.9rem}
+input.t,textarea.t{width:100%;padding:.6rem;border:1px solid var(--line);font:inherit;margin:.25rem 0}
+ul{padding-left:1.1rem}
+.tag{display:inline-block;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:.05rem .4rem;color:var(--grey)}
+.tag.ok{background:var(--yellow);border-color:var(--yellow);color:#222}
+a{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>Penang <b>Hokkien</b></h1><div class="muted" id="sub"></div></div>
+  <div class="right"><div class="ver">v2.1.0</div><div class="lang" id="lang"></div></div>
+</header>
+<nav id="nav"></nav>
+<main id="view"></main>
+</div>
+<script>
+/* ===== Penang Hokkien Speaking Trainer — v2.1.0 =====
+   Spelling: Taiji Romanisation (Penang Hokkien Dictionary system). */
+var UI={
+en:{sub:"Speak · shadow · review daily",today:"Today",sounds:"Sounds",deck:"Deck",plan:"Plan",
+ step1:"Learn & shadow new phrases",step2:"Review earlier phrases by speaking",start:"Start",open:"Open",next:"Next",back:"Back",done:"Done",
+ said:"I said it",again:"Again",native:"Native",mine:"My voice",compare:"Compare",rec:"Record",stop:"Stop",play:"Play",
+ nomic:"Microphone not available or blocked. Recording works when the app is opened in your own browser.",saved:"Saved",
+ none:"No native recording yet. Ask a Hokkien speaker to record it with the Native Record button, or listen online.",
+ listenOnline:"Listen online (dictionary)",listenCourse:"Free course audio",checked:"Checked by a native speaker",unchecked:"Not yet checked",
+ add:"Add a phrase",taiji:"Taiji spelling with tone numbers",en:"English meaning",idm:"Indonesian meaning (optional)",msm:"Malay meaning (optional)",addBtn:"Add",
+ importT:"Import lines",importHint:"One per line:  taiji | english | indonesian | malay  (last two optional)",importBtn:"Import",
+ del:"Delete",search:"Search…",finished:"Today's phrases are complete.",noNew:"No new phrases left. Add more in the Deck tab.",
+ noReview:"Nothing to review yet. Your first review is tomorrow.",reviewDone:"Review complete",revisit:"To revisit",
+ streak:"Day streak",learned:"Phrases learned",perDay:"New phrases a day",reset:"Reset all progress",confirm:"Erase all progress and recordings on this device?",
+ firstDay:"Prompt: say it in Hokkien, then tap to check.",tapCheck:"Tap to reveal",deckCount:"phrases in deck",
+ source:"Starter phrases come from the Penang Hokkien Dictionary / Learn Penang Hokkien (Timothy Tye). Add more from the free course lessons you listen to.",
+ sitTitle:"8-week plan",routine:"Daily routine",
+ routineL:["• Listen to the day's phrases (native audio).","• Shadow each: hear, say aloud, record, compare.","• Review every earlier phrase once, by speaking.","• Say the day's phrases to a real person once."],
+ weeks:["Week 1: sounds, tones, greetings, politeness, numbers","Week 2: food, ordering, kopi and tea","Week 3: shopping, bargaining, money","Week 4: family, small talk, where you're from","Week 5: directions and transport","Week 6: time, plans, daily routine","Week 7: feelings, health, asking for help","Week 8: WhatsApp-style chats, then free conversation"],
+ guideT:"Tones & spelling (Taiji)",
+ guide:["Spelling follows Taiji Romanisation, used by the Penang Hokkien Dictionary. It is not Pinyin, so don't read it as Pinyin.","• Tone numbers come after each syllable. Tones 1, 2, 3, 4 match the four Mandarin tones as local Mandarin speakers say them.","• Tone 33 sounds like tone 3 but never changes.","• Tone sandhi: in a phrase, every syllable except the last changes tone. 1 and 2 become 3. 3 and 4 become 1. 33 stays.","• So the same word can carry different tones alone and inside a phrase. Always copy a native speaker's phrase, not word by word.","• ph, kh = p, k with a puff of air. An inserted n marks a nasal sound (snar1 'three').","• Spelling is only a guide. Your ears and a native speaker decide how it sounds."]},
+id:{sub:"Bicara · tiru · ulang setiap hari",today:"Hari ini",sounds:"Bunyi",deck:"Kartu",plan:"Rencana",
+ step1:"Pelajari & tiru frasa baru",step2:"Ulang frasa sebelumnya dengan berbicara",start:"Mulai",open:"Buka",next:"Lanjut",back:"Kembali",done:"Selesai",
+ said:"Sudah saya ucapkan",again:"Ulang",native:"Penutur asli",mine:"Suara saya",compare:"Bandingkan",rec:"Rekam",stop:"Berhenti",play:"Putar",
+ nomic:"Mikrofon tidak tersedia atau diblokir. Merekam berfungsi saat aplikasi dibuka di browser Anda sendiri.",saved:"Tersimpan",
+ none:"Belum ada rekaman penutur asli. Minta penutur Hokkien merekamnya dengan tombol Rekam Penutur asli, atau dengarkan online.",
+ listenOnline:"Dengarkan online (kamus)",listenCourse:"Audio kursus gratis",checked:"Sudah dicek penutur asli",unchecked:"Belum dicek",
+ add:"Tambah frasa",taiji:"Ejaan Taiji dengan nomor nada",en:"Arti bahasa Inggris",idm:"Arti bahasa Indonesia (opsional)",msm:"Arti bahasa Melayu (opsional)",addBtn:"Tambah",
+ importT:"Impor baris",importHint:"Satu per baris:  taiji | inggris | indonesia | melayu  (dua terakhir opsional)",importBtn:"Impor",
+ del:"Hapus",search:"Cari…",finished:"Frasa hari ini selesai.",noNew:"Tidak ada frasa baru. Tambahkan di tab Kartu.",
+ noReview:"Belum ada yang diulang. Ulasan pertama besok.",reviewDone:"Ulasan selesai",revisit:"Perlu diulang",
+ streak:"Hari beruntun",learned:"Frasa dipelajari",perDay:"Frasa baru per hari",reset:"Hapus semua kemajuan",confirm:"Hapus semua kemajuan dan rekaman di perangkat ini?",
+ firstDay:"Ucapkan dalam Hokkien, lalu ketuk untuk memeriksa.",tapCheck:"Ketuk untuk melihat",deckCount:"frasa di kartu",
+ source:"Frasa awal berasal dari Penang Hokkien Dictionary / Learn Penang Hokkien (Timothy Tye). Tambahkan dari pelajaran kursus gratis yang Anda dengarkan.",
+ sitTitle:"Rencana 8 minggu",routine:"Rutinitas harian",
+ routineL:["• Dengarkan frasa hari ini (audio penutur asli).","• Tiru satu per satu: dengar, ucapkan, rekam, bandingkan.","• Ulang semua frasa sebelumnya sekali, dengan berbicara.","• Ucapkan frasa hari ini kepada orang sungguhan sekali."],
+ weeks:["Minggu 1: bunyi, nada, salam, sopan santun, angka","Minggu 2: makanan, memesan, kopi dan teh","Minggu 3: belanja, menawar, uang","Minggu 4: keluarga, obrolan ringan, asal daerah","Minggu 5: arah dan transportasi","Minggu 6: waktu, rencana, rutinitas","Minggu 7: perasaan, kesehatan, minta tolong","Minggu 8: obrolan gaya WhatsApp, lalu percakapan bebas"],
+ guideT:"Nada & ejaan (Taiji)",
+ guide:["Ejaan mengikuti Taiji Romanisation yang dipakai Penang Hokkien Dictionary. Bukan Pinyin, jadi jangan dibaca sebagai Pinyin.","• Nomor nada ditulis setelah tiap suku kata. Nada 1, 2, 3, 4 sesuai empat nada Mandarin seperti diucapkan penutur Mandarin setempat.","• Nada 33 terdengar seperti nada 3 tetapi tidak pernah berubah.","• Sandhi nada: dalam frasa, setiap suku kata kecuali yang terakhir berubah nada. 1 dan 2 menjadi 3. 3 dan 4 menjadi 1. 33 tetap.","• Jadi kata yang sama bisa punya nada berbeda saat sendiri dan di dalam frasa. Tirulah frasa penutur asli, bukan kata per kata.","• ph, kh = p, k dengan hembusan udara. Huruf n yang disisipkan menandai bunyi sengau (snar1 'tiga').","• Ejaan hanyalah panduan. Telinga Anda dan penutur asli yang menentukan bunyinya."]},
+ms:{sub:"Bertutur · ikut · ulang setiap hari",today:"Hari ini",sounds:"Bunyi",deck:"Kad",plan:"Pelan",
+ step1:"Belajar & ikut frasa baharu",step2:"Ulang kaji frasa lepas dengan bertutur",start:"Mula",open:"Buka",next:"Seterusnya",back:"Kembali",done:"Selesai",
+ said:"Saya dah sebut",again:"Ulang",native:"Penutur asli",mine:"Suara saya",compare:"Banding",rec:"Rakam",stop:"Henti",play:"Main",
+ nomic:"Mikrofon tidak tersedia atau disekat. Rakaman berfungsi apabila aplikasi dibuka dalam pelayar anda sendiri.",saved:"Disimpan",
+ none:"Belum ada rakaman penutur asli. Minta penutur Hokkien rakam dengan butang Rakam Penutur asli, atau dengar dalam talian.",
+ listenOnline:"Dengar dalam talian (kamus)",listenCourse:"Audio kursus percuma",checked:"Disemak penutur asli",unchecked:"Belum disemak",
+ add:"Tambah frasa",taiji:"Ejaan Taiji dengan nombor nada",en:"Maksud bahasa Inggeris",idm:"Maksud bahasa Indonesia (pilihan)",msm:"Maksud bahasa Melayu (pilihan)",addBtn:"Tambah",
+ importT:"Import baris",importHint:"Satu setiap baris:  taiji | inggeris | indonesia | melayu  (dua terakhir pilihan)",importBtn:"Import",
+ del:"Padam",search:"Cari…",finished:"Frasa hari ini selesai.",noNew:"Tiada frasa baharu. Tambah dalam tab Kad.",
+ noReview:"Belum ada untuk diulang kaji. Ulang kaji pertama esok.",reviewDone:"Ulang kaji selesai",revisit:"Perlu diulang",
+ streak:"Hari berturut-turut",learned:"Frasa dipelajari",perDay:"Frasa baharu sehari",reset:"Padam semua kemajuan",confirm:"Padam semua kemajuan dan rakaman pada peranti ini?",
+ firstDay:"Sebut dalam Hokkien, kemudian ketik untuk semak.",tapCheck:"Ketik untuk lihat",deckCount:"frasa dalam kad",
+ source:"Frasa permulaan datang daripada Penang Hokkien Dictionary / Learn Penang Hokkien (Timothy Tye). Tambah daripada pelajaran kursus percuma yang anda dengar.",
+ sitTitle:"Pelan 8 minggu",routine:"Rutin harian",
+ routineL:["• Dengar frasa hari ini (audio penutur asli).","• Ikut satu per satu: dengar, sebut, rakam, banding.","• Ulang kaji semua frasa lepas sekali, dengan bertutur.","• Sebut frasa hari ini kepada orang sebenar sekali."],
+ weeks:["Minggu 1: bunyi, nada, salam, sopan santun, nombor","Minggu 2: makanan, memesan, kopi dan teh","Minggu 3: membeli-belah, tawar-menawar, wang","Minggu 4: keluarga, borak ringan, asal usul","Minggu 5: arah dan pengangkutan","Minggu 6: masa, rancangan, rutin harian","Minggu 7: perasaan, kesihatan, minta tolong","Minggu 8: sembang gaya WhatsApp, kemudian perbualan bebas"],
+ guideT:"Nada & ejaan (Taiji)",
+ guide:["Ejaan mengikut Taiji Romanisation yang digunakan Penang Hokkien Dictionary. Ia bukan Pinyin, jadi jangan baca sebagai Pinyin.","• Nombor nada ditulis selepas setiap suku kata. Nada 1, 2, 3, 4 sepadan dengan empat nada Mandarin seperti disebut penutur Mandarin tempatan.","• Nada 33 kedengaran seperti nada 3 tetapi tidak pernah berubah.","• Sandhi nada: dalam frasa, setiap suku kata kecuali yang terakhir bertukar nada. 1 dan 2 menjadi 3. 3 dan 4 menjadi 1. 33 kekal.","• Jadi perkataan sama boleh ada nada berbeza apabila bersendirian dan dalam frasa. Ikut frasa penutur asli, bukan perkataan demi perkataan.","• ph, kh = p, k dengan hembusan nafas. Huruf n yang disisip menandakan bunyi sengau (snar1 'tiga').","• Ejaan hanya panduan. Telinga anda dan penutur asli menentukan bunyinya."]}
+};
+/* seed: [taiji, en, id, ms] — from Penang Hokkien Dictionary / Learn Penang Hokkien examples */
+var SEED=[
+["Gau3 ca4.","Good morning (literally 'how early')","Selamat pagi (harfiah: 'betapa awalnya')","Selamat pagi (harfiah: 'awalnya')"],
+["Wah4 mia3 Lee1 Hock1 Chye4.","My name is Lee Hock Chye.","Nama saya Lee Hock Chye.","Nama saya Lee Hock Chye."],
+["Lu4 tua3 ta1lok1?","Where do you stay?","Kamu tinggal di mana?","Awak tinggal di mana?"],
+["Wah4 tua3 ti1 Jit3lor33tong3.","I stay in Jelutong.","Saya tinggal di Jelutong.","Saya tinggal di Jelutong."],
+["Lu4 ay33hiau1 kong4 Hok1kien1 Wa33 boh2?","Do you speak Hokkien?","Apakah kamu bisa berbahasa Hokkien?","Awak boleh cakap Hokkien tak?"],
+["Ah3 Ee2, chnia4 jip1 lai2.","Please come in, Auntie.","Silakan masuk, Tante.","Sila masuk, Mak Cik."],
+["wah4","I / me","saya / aku","saya / aku"],
+["lu4","you","kamu","awak / kamu"],
+["ie1","he","dia (laki-laki)","dia (lelaki)"],
+["ee1","she","dia (perempuan)","dia (perempuan)"],
+["i1","it","ia (benda)","ia (benda)"],
+["khong3","zero","nol","sifar"],
+["cit1","one","satu","satu"],
+["nor33","two","dua","dua"],
+["snar1","three","tiga","tiga"],
+["see3","four","empat","empat"],
+["pa1","father","ayah","ayah / bapa"],
+["mak3","mother","ibu","ibu / mak"],
+["ko1","elder brother","kakak laki-laki","abang"],
+["ci4","elder sister","kakak perempuan","kakak"]
+].map(function(a,i){return {id:"s"+i,tj:a[0],en:a[1],id_:a[2],ms:a[3]}});
+
+var KEY="penangHokkienTrainerV2";
+function pad(n){return String(n).padStart(2,"0")}
+function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function today(){return dstr(new Date())}
+function yesterday(){var d=new Date();d.setDate(d.getDate()-1);return dstr(d)}
+var S=load();
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===2)return s}catch(e){}return {v:2,lang:"en",sz:6,custom:[],learned:{},days:{},checked:{},streak:0,lastActive:""}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function t(k){return (UI[S.lang]||UI.en)[k]||UI.en[k]}
+function deck(){return SEED.concat(S.custom)}
+function meanOf(it){return S.lang==="id"?(it.id_||it.en):S.lang==="ms"?(it.ms||it.en):it.en}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function byId(id){var d=deck();for(var i=0;i<d.length;i++)if(d[i].id===id)return d[i];return null}
+function touch(){var td=today();if(S.lastActive===td)return;S.streak=(S.lastActive===yesterday())?S.streak+1:1;S.lastActive=td;save()}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x}return a}
+
+/* ----- today's plan ----- */
+function todayRec(){
+  var td=today(),r=S.days[td];
+  if(!r){
+    var fresh=deck().filter(function(it){return !S.learned[it.id]}).slice(0,S.sz).map(function(it){return it.id});
+    r={nw:fresh,learnDone:false,reviewed:false};S.days[td]=r;save();
+  }
+  return r;
+}
+function reviewIds(){var td=today();return deck().filter(function(it){return S.learned[it.id]&&S.learned[it.id]<td}).map(function(it){return it.id})}
+
+/* ----- audio (IndexedDB) ----- */
+function idb(cb){try{var r=indexedDB.open("hokkienTrainerAudio",1);r.onupgradeneeded=function(){r.result.createObjectStore("a")};r.onsuccess=function(){cb(r.result)};r.onerror=function(){cb(null)}}catch(e){cb(null)}}
+function getRec(k,cb){idb(function(d){if(!d)return cb(null);try{var q=d.transaction("a").objectStore("a").get(k);q.onsuccess=function(){cb(q.result)};q.onerror=function(){cb(null)}}catch(e){cb(null)}})}
+function putRec(k,b,cb){idb(function(d){if(!d)return cb();var x=d.transaction("a","readwrite");x.objectStore("a").put(b,k);x.oncomplete=function(){cb()};x.onerror=function(){cb()}})}
+function clearRecs(cb){idb(function(d){if(!d)return cb();var x=d.transaction("a","readwrite");x.objectStore("a").clear();x.oncomplete=function(){cb()};x.onerror=function(){cb()}})}
+function toast(m){var d=document.createElement("div");d.textContent=m;d.style.cssText="position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;font-size:.85rem;max-width:90%;z-index:9";document.body.appendChild(d);setTimeout(function(){d.remove()},3800)}
+var curAudio=null;
+function playKey(k,cb){getRec(k,function(b){if(!b){cb&&cb(false);return}if(curAudio){try{curAudio.pause()}catch(e){}}var a=new Audio(URL.createObjectURL(b));curAudio=a;a.onended=function(){cb&&cb(true)};a.play().catch(function(){cb&&cb(false)})})}
+var R=null;
+function recKey(k,btn){
+  if(R){R.mr.stop();return}
+  if(!navigator.mediaDevices||!window.MediaRecorder){toast(t("nomic"));return}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(st){
+    var mr=new MediaRecorder(st),ch=[],label=btn.getAttribute("data-label");R={mr:mr};
+    btn.textContent="■ "+t("stop");btn.classList.add("rec");
+    mr.ondataavailable=function(e){if(e.data.size)ch.push(e.data)};
+    mr.onstop=function(){st.getTracks().forEach(function(x){x.stop()});var b=new Blob(ch,{type:mr.mimeType||"audio/webm"});R=null;btn.textContent=label;btn.classList.remove("rec");putRec(k,b,function(){toast(t("saved")+" ✓")})};
+    mr.start();
+  }).catch(function(){toast(t("nomic"))});
+}
+function audioRow(it){
+  var n="n:"+it.id,m="m:"+it.id;
+  function b(a,k,label,cls){return '<button class="btn sm '+(cls||"alt")+'" data-a="'+a+'" data-k="'+esc(k)+'" data-label="'+esc(label)+'">'+label+'</button>'}
+  return '<div class="muted" style="margin-top:.8rem">'+t("native")+'</div>'+b("play",n,"▶ "+t("play"))+b("rec",n,"● "+t("rec"))+
+   '<div class="muted" style="margin-top:.6rem">'+t("mine")+'</div>'+b("play",m,"▶ "+t("play"))+b("rec",m,"● "+t("rec"))+b("cmp",it.id,"⇄ "+t("compare"),"yel")+
+   '<div style="margin-top:.6rem"><a class="muted" href="https://www.penang-traveltips.com/dictionary/" target="_blank" rel="noopener">'+t("listenOnline")+'</a> · <a class="muted" href="https://www.penang-traveltips.com/penang-hokkien-for-beginners/english/index.htm" target="_blank" rel="noopener">'+t("listenCourse")+'</a></div>';
+}
+
+/* ----- shell ----- */
+var tab="today",sub=null,C=null;
+function chrome(){
+  document.documentElement.lang=S.lang;
+  document.getElementById("sub").textContent=t("sub");
+  document.getElementById("lang").innerHTML=["en","id","ms"].map(function(l){return '<button class="'+(S.lang===l?"on":"")+'" data-l="'+l+'">'+l.toUpperCase()+'</button>'}).join("");
+  document.getElementById("nav").innerHTML=["today","sounds","deck","plan"].map(function(x){return '<button class="'+(tab===x?"on":"")+'" data-t="'+x+'">'+t(x)+'</button>'}).join("");
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  if(b.dataset.l){S.lang=b.dataset.l;save();render();return}
+  if(b.dataset.t){tab=b.dataset.t;sub=null;C=null;render();return}
+  if(b.dataset.a)act(b.dataset.a,b.dataset.k,b);
+});
+function render(){chrome();var v=document.getElementById("view");({today:rToday,sounds:rSounds,deck:rDeck,plan:rPlan})[tab](v)}
+function act(a,k,b){
+  if(a==="learn"){var r=todayRec();C={mode:"learn",list:r.nw.map(byId).filter(Boolean),i:0,open:true,miss:[]};sub="cards";render()}
+  else if(a==="review"){C={mode:"review",list:shuffle(reviewIds()).map(byId).filter(Boolean),i:0,open:false,miss:[]};sub="cards";render()}
+  else if(a==="back"){sub=null;C=null;render()}
+  else if(a==="reveal"){C.open=true;render()}
+  else if(a==="next"){C.i++;C.open=C.mode==="learn";render()}
+  else if(a==="said"){C.i++;C.open=false;render()}
+  else if(a==="again"){C.miss.push(C.list[C.i]);C.i++;C.open=false;render()}
+  else if(a==="play"){playKey(k,function(ok){if(!ok)toast(t("none"))})}
+  else if(a==="rec"){recKey(k,b)}
+  else if(a==="cmp"){playKey("n:"+k,function(ok){if(!ok){toast(t("none"));return}setTimeout(function(){playKey("m:"+k)},300)})}
+  else if(a==="chk"){S.checked[k]=!S.checked[k];save();render()}
+  else if(a==="del"){S.custom=S.custom.filter(function(x){return x.id!==k});save();render()}
+  else if(a==="add"){addOne()}
+  else if(a==="imp"){importLines()}
+  else if(a==="sz"){S.sz=+k;save();var td=today();if(S.days[td]&&!S.days[td].learnDone)delete S.days[td];save();render()}
+  else if(a==="reset"){if(confirm(t("confirm"))){var l=S.lang;S={v:2,lang:l,sz:6,custom:[],learned:{},days:{},checked:{},streak:0,lastActive:""};save();clearRecs(function(){sub=null;C=null;render()})}}
+}
+
+/* ----- today ----- */
+function stepRow(n,label,ok,a,enabled){return '<div class="step"><div class="dot '+(ok?"ok":"")+'">'+(ok?"✓":n)+'</div><div style="flex:1">'+label+'</div><button class="btn '+(ok?"alt":"")+'" '+(enabled?"":"disabled")+' data-a="'+a+'">'+(ok?t("open"):t("start"))+'</button></div>'}
+function rToday(v){
+  if(sub==="cards"&&C)return rCards(v);
+  var r=todayRec(),rv=reviewIds(),h='<div class="card muted">'+t("streak")+': <b>'+S.streak+'</b> · '+t("learned")+': <b>'+Object.keys(S.learned).length+'</b> · '+deck().length+' '+t("deckCount")+'</div>';
+  if(!r.nw.length&&!rv.length){v.innerHTML=h+'<div class="card">'+t("noNew")+'</div>';return}
+  var nOk=r.learnDone||!r.nw.length,rOk=r.reviewed||!rv.length;
+  h+='<div class="card">'+stepRow(1,t("step1")+(r.nw.length?" ("+r.nw.length+")":""),r.learnDone,"learn",r.nw.length>0)+stepRow(2,t("step2")+(rv.length?" ("+rv.length+")":""),rOk,"review",rv.length>0&&!r.reviewed||r.reviewed)+'</div>';
+  if(!rv.length)h+='<div class="card muted">'+t("noReview")+'</div>';
+  if(!r.nw.length)h+='<div class="card muted">'+t("noNew")+'</div>';
+  if(r.learnDone&&(r.reviewed||!rv.length))h+='<div class="card">'+t("finished")+'</div>';
+  v.innerHTML=h;
+}
+function rCards(v){
+  var it=C.list[C.i];
+  if(!it){return finish(v)}
+  var h='<div class="prog"><i style="width:'+(C.i/C.list.length*100)+'%"></i></div><div class="muted">'+(C.i+1)+' / '+C.list.length+'</div><div class="card"><div class="phrase">';
+  if(C.mode==="learn"){h+='<div class="big">'+esc(it.tj)+'</div><div class="mean">'+esc(meanOf(it))+'</div></div>'+audioRow(it)+'</div><button class="btn" data-a="next">'+t("next")+'</button>'}
+  else{
+    h+='<div class="mean" style="margin:0">'+esc(meanOf(it))+'</div>';
+    if(!C.open){h+='<div class="muted" style="margin-top:.8rem">'+t("firstDay")+'</div></div></div><button class="btn" data-a="reveal">'+t("tapCheck")+'</button>'}
+    else{h+='<div class="big" style="margin-top:.8rem">'+esc(it.tj)+'</div></div>'+audioRow(it)+'</div><button class="btn yel" data-a="said">'+t("said")+'</button><button class="btn alt" data-a="again">'+t("again")+'</button>'}
+  }
+  h+='<div><button class="btn alt sm" data-a="back">'+t("back")+'</button></div>';
+  v.innerHTML=h;
+}
+function finish(v){
+  var c=C;C=null;sub=null;var r=todayRec(),td=today();
+  if(c.mode==="learn"){r.nw.forEach(function(id){S.learned[id]=td});r.learnDone=true}else{r.reviewed=true}
+  save();touch();
+  var h='<div class="card"><h2 style="margin-top:0">'+(c.mode==="learn"?t("done"):t("reviewDone"))+' ✓</h2>';
+  if(c.miss.length){h+='<div class="muted">'+t("revisit")+'</div><table>'+c.miss.map(function(it){return '<tr><td><b>'+esc(it.tj)+'</b></td><td>'+esc(meanOf(it))+'</td></tr>'}).join("")+'</table>'}
+  v.innerHTML=h+'</div><button class="btn" data-a="back">'+t("back")+'</button>';
+}
+
+/* ----- sounds ----- */
+function rSounds(v){
+  v.innerHTML='<div class="card"><h2 style="margin-top:0">'+t("guideT")+'</h2>'+t("guide").map(function(l,i){return i===0?'<p>'+esc(l)+'</p>':'<div style="margin:.3rem 0">'+esc(l)+'</div>'}).join("")+'</div>';
+}
+
+/* ----- deck ----- */
+function addOne(){
+  var tj=document.getElementById("f-tj").value.trim(),en=document.getElementById("f-en").value.trim();
+  if(!tj||!en)return;
+  S.custom.push({id:"c"+Date.now()+Math.floor(Math.random()*1000),tj:tj,en:en,id_:document.getElementById("f-id").value.trim(),ms:document.getElementById("f-ms").value.trim()});
+  save();render();
+}
+function importLines(){
+  var lines=document.getElementById("f-imp").value.split(/\r?\n/),n=0;
+  lines.forEach(function(l){var p=l.split("|").map(function(x){return x.trim()});if(p[0]&&p[1]){S.custom.push({id:"c"+Date.now()+"-"+(n++)+Math.floor(Math.random()*1000),tj:p[0],en:p[1],id_:p[2]||"",ms:p[3]||""})}});
+  save();render();
+}
+function rDeck(v){
+  var h='<div class="card"><b>'+t("perDay")+'</b><div>'+[4,6,8,10].map(function(n){return '<button class="btn sm '+(S.sz===n?"":"alt")+'" data-a="sz" data-k="'+n+'">'+n+'</button>'}).join("")+'</div></div>';
+  h+='<div class="card"><b>'+t("add")+'</b><input class="t" id="f-tj" placeholder="'+esc(t("taiji"))+'"><input class="t" id="f-en" placeholder="'+esc(t("en"))+'"><input class="t" id="f-id" placeholder="'+esc(t("idm"))+'"><input class="t" id="f-ms" placeholder="'+esc(t("msm"))+'"><button class="btn" data-a="add">'+t("addBtn")+'</button></div>';
+  h+='<div class="card"><b>'+t("importT")+'</b><div class="muted">'+esc(t("importHint"))+'</div><textarea class="t" id="f-imp" rows="4"></textarea><button class="btn" data-a="imp">'+t("importBtn")+'</button></div>';
+  h+='<div class="card"><table>'+deck().map(function(it){var ck=!!S.checked[it.id],cu=it.id[0]==="c";return '<tr><td><b>'+esc(it.tj)+'</b><br><span class="muted">'+esc(meanOf(it))+'</span></td><td style="text-align:right"><button class="btn sm alt" data-a="chk" data-k="'+it.id+'"><span class="tag '+(ck?"ok":"")+'">'+(ck?"✓ "+t("checked"):t("unchecked"))+'</span></button>'+(cu?'<button class="btn sm alt" data-a="del" data-k="'+it.id+'">'+t("del")+'</button>':"")+'</td></tr>'}).join("")+'</table></div>';
+  h+='<p class="muted">'+esc(t("source"))+'</p><button class="btn alt" data-a="reset">'+t("reset")+'</button>';
+  v.innerHTML=h;
+}
+
+/* ----- plan ----- */
+function rPlan(v){
+  v.innerHTML='<div class="card"><h2 style="margin-top:0">'+t("routine")+'</h2>'+t("routineL").map(function(l){return '<div style="margin:.3rem 0">'+esc(l)+'</div>'}).join("")+'</div><div class="card"><h2 style="margin-top:0">'+t("sitTitle")+'</h2>'+t("weeks").map(function(l){return '<div style="margin:.3rem 0">• '+esc(l)+'</div>'}).join("")+'</div>';
+}
+if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){window.addEventListener("load",function(){try{navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}})}
+render();
+</script>
+</body>
+</html>
