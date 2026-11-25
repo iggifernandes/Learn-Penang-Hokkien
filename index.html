@@ -59,13 +59,13 @@ a{color:var(--red)}
 <div class="wrap">
 <header>
   <div><h1>Penang <b>Hokkien</b></h1><div class="muted" id="sub"></div></div>
-  <div class="right"><div class="ver">v2.1.0</div><div class="lang" id="lang"></div></div>
+  <div class="right"><div class="ver">v3.0.0</div><div class="lang" id="lang"></div></div>
 </header>
 <nav id="nav"></nav>
 <main id="view"></main>
 </div>
 <script>
-/* ===== Penang Hokkien Speaking Trainer — v2.1.0 =====
+/* ===== Penang Hokkien Speaking Trainer — v3.0.0 =====
    Spelling: Taiji Romanisation (Penang Hokkien Dictionary system). */
 var UI={
 en:{sub:"Speak · shadow · review daily",today:"Today",sounds:"Sounds",deck:"Deck",plan:"Plan",
@@ -124,6 +124,9 @@ ms:{sub:"Bertutur · ikut · ulang setiap hari",today:"Hari ini",sounds:"Bunyi",
  guide:["Ejaan mengikut Taiji Romanisation yang digunakan Penang Hokkien Dictionary. Ia bukan Pinyin, jadi jangan baca sebagai Pinyin.","• Nombor nada ditulis selepas setiap suku kata. Nada 1, 2, 3, 4 sepadan dengan empat nada Mandarin seperti disebut penutur Mandarin tempatan.","• Nada 33 kedengaran seperti nada 3 tetapi tidak pernah berubah.","• Sandhi nada: dalam frasa, setiap suku kata kecuali yang terakhir bertukar nada. 1 dan 2 menjadi 3. 3 dan 4 menjadi 1. 33 kekal.","• Jadi perkataan sama boleh ada nada berbeza apabila bersendirian dan dalam frasa. Ikut frasa penutur asli, bukan perkataan demi perkataan.","• ph, kh = p, k dengan hembusan nafas. Huruf n yang disisip menandakan bunyi sengau (snar1 'tiga').","• Ejaan hanya panduan. Telinga anda dan penutur asli menentukan bunyinya."]}
 };
 /* seed: [taiji, en, id, ms] — from Penang Hokkien Dictionary / Learn Penang Hokkien examples */
+Object.assign(UI.en,{none:"No native audio for this phrase yet.",hasAudio:"Native audio",noAudio:"No audio yet",noAudioHelp:"No voice yet. Record a native speaker (button below, or the Recording sheet in Deck), or import audio files.",speed:"Speed",loop:"Repeat",listen:"Listen",recNative:"Record native speaker",sheet:"Recording sheet (hand the phone to a native speaker)",importAudio:"Import audio files (file name = phrase ID, e.g. s0.m4a)",csv:"Export phrase list (CSV)",prev:"Previous",imported:"Imported",unmatched:"unmatched",shadow:"Listen, then say it in the silent gap.",sheetHelp:"Ask the speaker to say the phrase naturally. Tap Record, speak, tap Stop."});
+Object.assign(UI.id,{none:"Belum ada audio penutur asli untuk frasa ini.",hasAudio:"Audio penutur asli",noAudio:"Belum ada audio",noAudioHelp:"Belum ada suara. Rekam penutur asli (tombol di bawah, atau Lembar rekam di Kartu), atau impor file audio.",speed:"Kecepatan",loop:"Ulangi",listen:"Dengar",recNative:"Rekam penutur asli",sheet:"Lembar rekam (berikan ponsel ke penutur asli)",importAudio:"Impor file audio (nama file = ID frasa, mis. s0.m4a)",csv:"Ekspor daftar frasa (CSV)",prev:"Sebelumnya",imported:"Diimpor",unmatched:"tidak cocok",shadow:"Dengarkan, lalu ucapkan di jeda hening.",sheetHelp:"Minta penutur mengucapkan frasa dengan alami. Ketuk Rekam, bicara, ketuk Berhenti."});
+Object.assign(UI.ms,{none:"Belum ada audio penutur asli untuk frasa ini.",hasAudio:"Audio penutur asli",noAudio:"Belum ada audio",noAudioHelp:"Belum ada suara. Rakam penutur asli (butang di bawah, atau Helaian rakaman dalam Kad), atau import fail audio.",speed:"Kelajuan",loop:"Ulang",listen:"Dengar",recNative:"Rakam penutur asli",sheet:"Helaian rakaman (beri telefon kepada penutur asli)",importAudio:"Import fail audio (nama fail = ID frasa, cth. s0.m4a)",csv:"Eksport senarai frasa (CSV)",prev:"Sebelumnya",imported:"Diimport",unmatched:"tidak sepadan",shadow:"Dengar, kemudian sebut dalam senyap.",sheetHelp:"Minta penutur sebut frasa secara semula jadi. Ketik Rakam, bertutur, ketik Henti."});
 var SEED=[
 ["Gau3 ca4.","Good morning (literally 'how early')","Selamat pagi (harfiah: 'betapa awalnya')","Selamat pagi (harfiah: 'awalnya')"],
 ["Wah4 mia3 Lee1 Hock1 Chye4.","My name is Lee Hock Chye.","Nama saya Lee Hock Chye.","Nama saya Lee Hock Chye."],
@@ -153,7 +156,7 @@ function dstr(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDat
 function today(){return dstr(new Date())}
 function yesterday(){var d=new Date();d.setDate(d.getDate()-1);return dstr(d)}
 var S=load();
-function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===2)return s}catch(e){}return {v:2,lang:"en",sz:6,custom:[],learned:{},days:{},checked:{},streak:0,lastActive:""}}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===2)return s}catch(e){}return {v:2,lang:"en",spd:1,lp:1,sz:6,custom:[],learned:{},days:{},checked:{},streak:0,lastActive:""}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function t(k){return (UI[S.lang]||UI.en)[k]||UI.en[k]}
 function deck(){return SEED.concat(S.custom)}
@@ -176,12 +179,29 @@ function reviewIds(){var td=today();return deck().filter(function(it){return S.l
 
 /* ----- audio (IndexedDB) ----- */
 function idb(cb){try{var r=indexedDB.open("hokkienTrainerAudio",1);r.onupgradeneeded=function(){r.result.createObjectStore("a")};r.onsuccess=function(){cb(r.result)};r.onerror=function(){cb(null)}}catch(e){cb(null)}}
+var NATIVE={};
+function loadKeys(cb){idb(function(d){if(!d)return cb();try{var q=d.transaction("a").objectStore("a").getAllKeys();q.onsuccess=function(){(q.result||[]).forEach(function(k){if(String(k).indexOf("n:")===0)NATIVE[String(k).slice(2)]=1});cb()};q.onerror=function(){cb()}}catch(e){cb()}})}
 function getRec(k,cb){idb(function(d){if(!d)return cb(null);try{var q=d.transaction("a").objectStore("a").get(k);q.onsuccess=function(){cb(q.result)};q.onerror=function(){cb(null)}}catch(e){cb(null)}})}
-function putRec(k,b,cb){idb(function(d){if(!d)return cb();var x=d.transaction("a","readwrite");x.objectStore("a").put(b,k);x.oncomplete=function(){cb()};x.onerror=function(){cb()}})}
-function clearRecs(cb){idb(function(d){if(!d)return cb();var x=d.transaction("a","readwrite");x.objectStore("a").clear();x.oncomplete=function(){cb()};x.onerror=function(){cb()}})}
+function putRec(k,b,cb){idb(function(d){if(!d)return cb();var x=d.transaction("a","readwrite");x.objectStore("a").put(b,k);x.oncomplete=function(){if(String(k).indexOf('n:')===0)NATIVE[String(k).slice(2)]=1;cb()};x.onerror=function(){cb()}})}
+function clearRecs(cb){NATIVE={};idb(function(d){if(!d)return cb();var x=d.transaction("a","readwrite");x.objectStore("a").clear();x.oncomplete=function(){cb()};x.onerror=function(){cb()}})}
 function toast(m){var d=document.createElement("div");d.textContent=m;d.style.cssText="position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#222;color:#fff;padding:.6rem 1rem;font-size:.85rem;max-width:90%;z-index:9";document.body.appendChild(d);setTimeout(function(){d.remove()},3800)}
 var curAudio=null;
 function playKey(k,cb){getRec(k,function(b){if(!b){cb&&cb(false);return}if(curAudio){try{curAudio.pause()}catch(e){}}var a=new Audio(URL.createObjectURL(b));curAudio=a;a.onended=function(){cb&&cb(true)};a.play().catch(function(){cb&&cb(false)})})}
+var LT=0;
+function playLoop(id){
+  var tok=++LT,i=0;
+  function go(){
+    getRec("n:"+id,function(bl){
+      if(tok!==LT)return;
+      if(!bl){toast(t("none"));return}
+      if(curAudio){try{curAudio.pause()}catch(e){}}
+      var a=new Audio(URL.createObjectURL(bl));a.playbackRate=S.spd;try{a.preservesPitch=true}catch(e){}curAudio=a;
+      a.onended=function(){var d=(a.duration&&isFinite(a.duration))?a.duration/S.spd*1000:1500;URL.revokeObjectURL(a.src);i++;if(i<S.lp&&tok===LT)setTimeout(go,d+400)};
+      a.play().catch(function(){toast(t("none"))});
+    });
+  }
+  go();
+}
 var R=null;
 function recKey(k,btn){
   if(R){R.mr.stop();return}
@@ -190,16 +210,20 @@ function recKey(k,btn){
     var mr=new MediaRecorder(st),ch=[],label=btn.getAttribute("data-label");R={mr:mr};
     btn.textContent="■ "+t("stop");btn.classList.add("rec");
     mr.ondataavailable=function(e){if(e.data.size)ch.push(e.data)};
-    mr.onstop=function(){st.getTracks().forEach(function(x){x.stop()});var b=new Blob(ch,{type:mr.mimeType||"audio/webm"});R=null;btn.textContent=label;btn.classList.remove("rec");putRec(k,b,function(){toast(t("saved")+" ✓")})};
+    mr.onstop=function(){st.getTracks().forEach(function(x){x.stop()});var b=new Blob(ch,{type:mr.mimeType||"audio/webm"});R=null;btn.textContent=label;btn.classList.remove("rec");putRec(k,b,function(){toast(t("saved")+" ✓");if(k.indexOf("n:")===0)render()})};
     mr.start();
   }).catch(function(){toast(t("nomic"))});
 }
 function audioRow(it){
-  var n="n:"+it.id,m="m:"+it.id;
+  var n="n:"+it.id,m="m:"+it.id,has=NATIVE[it.id];
   function b(a,k,label,cls){return '<button class="btn sm '+(cls||"alt")+'" data-a="'+a+'" data-k="'+esc(k)+'" data-label="'+esc(label)+'">'+label+'</button>'}
-  return '<div class="muted" style="margin-top:.8rem">'+t("native")+'</div>'+b("play",n,"▶ "+t("play"))+b("rec",n,"● "+t("rec"))+
-   '<div class="muted" style="margin-top:.6rem">'+t("mine")+'</div>'+b("play",m,"▶ "+t("play"))+b("rec",m,"● "+t("rec"))+b("cmp",it.id,"⇄ "+t("compare"),"yel")+
-   '<div style="margin-top:.6rem"><a class="muted" href="https://www.penang-traveltips.com/dictionary/" target="_blank" rel="noopener">'+t("listenOnline")+'</a> · <a class="muted" href="https://www.penang-traveltips.com/penang-hokkien-for-beginners/english/index.htm" target="_blank" rel="noopener">'+t("listenCourse")+'</a></div>';
+  function chips(a,vals,cur,fmt){return vals.map(function(v){return '<button class="btn sm '+(v===cur?"":"alt")+'" data-a="'+a+'" data-k="'+v+'">'+fmt(v)+'</button>'}).join("")}
+  var h='<div style="margin-top:.8rem"><span class="tag '+(has?"ok":"")+'">'+(has?t("hasAudio"):t("noAudio"))+'</span></div>';
+  if(has){h+=b("playn",it.id,"▶ "+t("listen"),"")+'<div class="muted" style="margin-top:.5rem">'+t("speed")+'</div>'+chips("spd",[0.6,0.8,1],S.spd,function(v){return v+"x"})+'<div class="muted" style="margin-top:.5rem">'+t("loop")+'</div>'+chips("lp",[1,3,5],S.lp,function(v){return v+"×"})+'<div class="muted" style="margin-top:.4rem">'+t("shadow")+'</div>'}
+  else h+='<div class="muted" style="margin:.4rem 0">'+t("noAudioHelp")+'</div>';
+  h+='<div style="margin-top:.6rem">'+b("rec",n,"● "+t("recNative"))+'</div>';
+  h+='<div class="muted" style="margin-top:.8rem">'+t("mine")+'</div>'+b("play",m,"▶ "+t("play"))+b("rec",m,"● "+t("rec"))+(has?b("cmp",it.id,"⇄ "+t("compare"),"yel"):"");
+  return h;
 }
 
 /* ----- shell ----- */
@@ -213,18 +237,25 @@ function chrome(){
 document.addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;
   if(b.dataset.l){S.lang=b.dataset.l;save();render();return}
-  if(b.dataset.t){tab=b.dataset.t;sub=null;C=null;render();return}
+  if(b.dataset.t){LT++;tab=b.dataset.t;sub=null;C=null;render();return}
   if(b.dataset.a)act(b.dataset.a,b.dataset.k,b);
 });
 function render(){chrome();var v=document.getElementById("view");({today:rToday,sounds:rSounds,deck:rDeck,plan:rPlan})[tab](v)}
 function act(a,k,b){
   if(a==="learn"){var r=todayRec();C={mode:"learn",list:r.nw.map(byId).filter(Boolean),i:0,open:true,miss:[]};sub="cards";render()}
   else if(a==="review"){C={mode:"review",list:shuffle(reviewIds()).map(byId).filter(Boolean),i:0,open:false,miss:[]};sub="cards";render()}
-  else if(a==="back"){sub=null;C=null;render()}
+  else if(a==="back"){LT++;sub=null;C=null;render()}
   else if(a==="reveal"){C.open=true;render()}
   else if(a==="next"){C.i++;C.open=C.mode==="learn";render()}
   else if(a==="said"){C.i++;C.open=false;render()}
   else if(a==="again"){C.miss.push(C.list[C.i]);C.i++;C.open=false;render()}
+  else if(a==="playn"){playLoop(k)}
+  else if(a==="spd"){S.spd=+k;save();render()}
+  else if(a==="lp"){S.lp=+k;save();render()}
+  else if(a==="sheet"){sub="sheet";SH=0;render()}
+  else if(a==="sp"){SH=Math.max(0,SH-1);render()}
+  else if(a==="sn"){SH=Math.min(deck().length-1,SH+1);render()}
+  else if(a==="csv"){exportCsv()}
   else if(a==="play"){playKey(k,function(ok){if(!ok)toast(t("none"))})}
   else if(a==="rec"){recKey(k,b)}
   else if(a==="cmp"){playKey("n:"+k,function(ok){if(!ok){toast(t("none"));return}setTimeout(function(){playKey("m:"+k)},300)})}
@@ -233,7 +264,7 @@ function act(a,k,b){
   else if(a==="add"){addOne()}
   else if(a==="imp"){importLines()}
   else if(a==="sz"){S.sz=+k;save();var td=today();if(S.days[td]&&!S.days[td].learnDone)delete S.days[td];save();render()}
-  else if(a==="reset"){if(confirm(t("confirm"))){var l=S.lang;S={v:2,lang:l,sz:6,custom:[],learned:{},days:{},checked:{},streak:0,lastActive:""};save();clearRecs(function(){sub=null;C=null;render()})}}
+  else if(a==="reset"){if(confirm(t("confirm"))){var l=S.lang;S={v:2,lang:l,spd:1,lp:1,sz:6,custom:[],learned:{},days:{},checked:{},streak:0,lastActive:""};save();clearRecs(function(){sub=null;C=null;render()})}}
 }
 
 /* ----- today ----- */
@@ -288,8 +319,34 @@ function importLines(){
   lines.forEach(function(l){var p=l.split("|").map(function(x){return x.trim()});if(p[0]&&p[1]){S.custom.push({id:"c"+Date.now()+"-"+(n++)+Math.floor(Math.random()*1000),tj:p[0],en:p[1],id_:p[2]||"",ms:p[3]||""})}});
   save();render();
 }
+var SH=0;
+function exportCsv(){
+  var rows=[["id","taiji","english"]].concat(deck().map(function(it){return [it.id,it.tj,it.en]}));
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\n");
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="penang-hokkien-phrases.csv";document.body.appendChild(a);a.click();a.remove();
+}
+function importAudio(files){
+  var d=deck(),ok=0,bad=[],n=files.length;
+  if(!n)return;
+  Array.prototype.forEach.call(files,function(f){
+    var base=f.name.replace(/\.[^.]+$/,"").toLowerCase().replace(/_slow$/,"");
+    var it=null;for(var i=0;i<d.length;i++)if(String(d[i].id).toLowerCase()===base)it=d[i];
+    if(!it){bad.push(f.name);if(--n===0)done();return}
+    putRec("n:"+it.id,f,function(){ok++;if(--n===0)done()});
+  });
+  function done(){toast(t("imported")+": "+ok+(bad.length?" · "+bad.length+" "+t("unmatched")+": "+bad.slice(0,3).join(", "):""));render()}
+}
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="f-aud"){importAudio(e.target.files)}});
+function rSheet(v){
+  var d=deck(),it=d[SH];
+  if(!it){sub=null;render();return}
+  var n="n:"+it.id,has=NATIVE[it.id];
+  v.innerHTML='<div class="prog"><i style="width:'+((SH+1)/d.length*100)+'%"></i></div><div class="muted">'+(SH+1)+' / '+d.length+' · ID '+esc(it.id)+'</div><div class="card"><div class="phrase"><div class="big">'+esc(it.tj)+'</div><div class="mean">'+esc(it.en)+'</div></div><p class="muted">'+esc(t("sheetHelp"))+'</p><span class="tag '+(has?"ok":"")+'">'+(has?t("hasAudio"):t("noAudio"))+'</span><div style="margin-top:.6rem"><button class="btn" data-a="rec" data-k="'+esc(n)+'" data-label="● '+esc(t("rec"))+'">● '+t("rec")+'</button>'+(has?'<button class="btn alt" data-a="playn" data-k="'+esc(it.id)+'">▶ '+t("play")+'</button>':'')+'</div></div><button class="btn alt" data-a="sp">'+t("prev")+'</button><button class="btn yel" data-a="sn">'+t("next")+'</button><div><button class="btn alt sm" data-a="back">'+t("back")+'</button></div>';
+}
 function rDeck(v){
+  if(sub==="sheet")return rSheet(v);
   var h='<div class="card"><b>'+t("perDay")+'</b><div>'+[4,6,8,10].map(function(n){return '<button class="btn sm '+(S.sz===n?"":"alt")+'" data-a="sz" data-k="'+n+'">'+n+'</button>'}).join("")+'</div></div>';
+  h+='<div class="card"><button class="btn" data-a="sheet">'+t("sheet")+'</button><div style="margin-top:.6rem"><b>'+t("importAudio")+'</b><input class="t" type="file" id="f-aud" accept="audio/*" multiple></div><button class="btn alt sm" data-a="csv">'+t("csv")+'</button></div>';
   h+='<div class="card"><b>'+t("add")+'</b><input class="t" id="f-tj" placeholder="'+esc(t("taiji"))+'"><input class="t" id="f-en" placeholder="'+esc(t("en"))+'"><input class="t" id="f-id" placeholder="'+esc(t("idm"))+'"><input class="t" id="f-ms" placeholder="'+esc(t("msm"))+'"><button class="btn" data-a="add">'+t("addBtn")+'</button></div>';
   h+='<div class="card"><b>'+t("importT")+'</b><div class="muted">'+esc(t("importHint"))+'</div><textarea class="t" id="f-imp" rows="4"></textarea><button class="btn" data-a="imp">'+t("importBtn")+'</button></div>';
   h+='<div class="card"><table>'+deck().map(function(it){var ck=!!S.checked[it.id],cu=it.id[0]==="c";return '<tr><td><b>'+esc(it.tj)+'</b><br><span class="muted">'+esc(meanOf(it))+'</span></td><td style="text-align:right"><button class="btn sm alt" data-a="chk" data-k="'+it.id+'"><span class="tag '+(ck?"ok":"")+'">'+(ck?"✓ "+t("checked"):t("unchecked"))+'</span></button>'+(cu?'<button class="btn sm alt" data-a="del" data-k="'+it.id+'">'+t("del")+'</button>':"")+'</td></tr>'}).join("")+'</table></div>';
@@ -302,7 +359,7 @@ function rPlan(v){
   v.innerHTML='<div class="card"><h2 style="margin-top:0">'+t("routine")+'</h2>'+t("routineL").map(function(l){return '<div style="margin:.3rem 0">'+esc(l)+'</div>'}).join("")+'</div><div class="card"><h2 style="margin-top:0">'+t("sitTitle")+'</h2>'+t("weeks").map(function(l){return '<div style="margin:.3rem 0">• '+esc(l)+'</div>'}).join("")+'</div>';
 }
 if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0){window.addEventListener("load",function(){try{navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}})}
-render();
+loadKeys(function(){render()});
 </script>
 </body>
 </html>
